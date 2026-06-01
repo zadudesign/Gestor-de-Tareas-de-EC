@@ -2,21 +2,57 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { ProyectoEC } from '../types';
 import { Plus, Search, Filter, MoreVertical, Calendar as CalendarIcon, Loader2, FolderGit2 } from 'lucide-react';
+import { CreateProjectModal } from '../components/CreateProjectModal';
 
 export default function Projects() {
   const [projects, setProjects] = useState<ProyectoEC[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchProjects();
+    checkAuth();
+
+    // Suscripción en tiempo real a la tabla proyectos_ec
+    const channel = supabase
+      .channel('proyectos_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'proyectos_ec',
+        },
+        (payload) => {
+          console.log('Cambio detectado:', payload);
+          if (payload.eventType === 'INSERT') {
+            setProjects((prev) => [payload.new as ProyectoEC, ...prev]);
+          } else if (payload.eventType === 'DELETE') {
+            setProjects((prev) => prev.filter((p) => p.id !== payload.old.id));
+          } else if (payload.eventType === 'UPDATE') {
+            setProjects((prev) =>
+              prev.map((p) => (p.id === payload.new.id ? (payload.new as ProyectoEC) : p))
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
+
+  async function checkAuth() {
+    const { data: { session } } = await supabase.auth.getSession();
+    setIsAdmin(!!session);
+  }
 
   async function fetchProjects() {
     try {
       setLoading(true);
-      // Supabase is configured in lib/supabase.ts.
-      // If it's missing env vars, supabase query will fail safely and we can handle it.
       const { data, error } = await supabase
         .from('proyectos_ec')
         .select('*')
@@ -27,9 +63,9 @@ export default function Projects() {
       }
 
       setProjects(data || []);
+      setError(null);
     } catch (err: any) {
       console.error('Error fetching projects:', err);
-      // Fallback a un error amigable o datos vacíos si no está configurado Supabase aún
       setError(err.message || 'No se pudieron cargar los proyectos. Verifica la conexión a Supabase.');
     } finally {
       setLoading(false);
@@ -57,10 +93,15 @@ export default function Projects() {
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Proyectos</h1>
           <p className="text-slate-500 mt-1">Gestiona los proyectos del área de Educación Continua.</p>
         </div>
-        <button className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
-          <Plus className="w-4 h-4" />
-          <span>Nuevo Proyecto</span>
-        </button>
+        {isAdmin && (
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Nuevo Proyecto</span>
+          </button>
+        )}
       </div>
 
       {/* Toolbar */}
@@ -103,10 +144,15 @@ export default function Projects() {
             </div>
             <h3 className="text-lg font-medium text-slate-900 mb-1">No hay proyectos</h3>
             <p className="text-slate-500 max-w-sm mb-6">Aún no se han creado proyectos. Comienza añadiendo uno nuevo.</p>
-            <button className="inline-flex items-center space-x-2 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg border border-slate-300 font-medium transition-colors">
-              <Plus className="w-4 h-4" />
-              <span>Crear el primer proyecto</span>
-            </button>
+            {isAdmin && (
+              <button 
+                onClick={() => setIsModalOpen(true)}
+                className="inline-flex items-center space-x-2 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg border border-slate-300 font-medium transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Crear el primer proyecto</span>
+              </button>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -117,7 +163,7 @@ export default function Projects() {
                   <th className="px-6 py-4">Estado</th>
                   <th className="px-6 py-4">Fecha de Inicio</th>
                   <th className="px-6 py-4">Fecha de Fin</th>
-                  <th className="px-6 py-4 text-right">Acciones</th>
+                  {isAdmin && <th className="px-6 py-4 text-right">Acciones</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
@@ -144,11 +190,13 @@ export default function Projects() {
                         <span>{project.end_date || 'N/A'}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <button className="text-slate-400 hover:text-slate-600 p-1 rounded-md hover:bg-slate-100 transition-colors">
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                    </td>
+                    {isAdmin && (
+                      <td className="px-6 py-4 text-right">
+                        <button className="text-slate-400 hover:text-slate-600 p-1 rounded-md hover:bg-slate-100 transition-colors">
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -156,6 +204,13 @@ export default function Projects() {
           </div>
         )}
       </div>
+
+      {/* Modal de Creación */}
+      <CreateProjectModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={fetchProjects}
+      />
     </div>
   );
 }

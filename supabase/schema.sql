@@ -7,7 +7,7 @@ CREATE TABLE public.profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL PRIMARY KEY,
   email TEXT NOT NULL,
   full_name TEXT,
-  role public.user_role DEFAULT 'member' NOT NULL,
+  role public.user_role DEFAULT 'admin' NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -43,13 +43,9 @@ ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 -- Perfiles: Todos pueden leer perfiles, solo uno mismo puede editar el suyo o un admin.
 CREATE POLICY "Public profiles are viewable by everyone." ON public.profiles FOR SELECT USING (true);
 
--- Tareas: Admins ven/hacen todo. Miembros ven sus tareas asignadas y las que crearon.
-CREATE POLICY "Tasks are viewable by assignees and creators, or admins." 
-  ON public.tasks FOR SELECT USING (
-    auth.uid() = assignee_id OR 
-    auth.uid() = creator_id OR 
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-  );
+-- Tareas: Todo el mundo puede ver las tareas
+CREATE POLICY "Tasks are viewable by everyone." 
+  ON public.tasks FOR SELECT USING (true);
 
 -- Función para manejar timestamps en update de tasks
 CREATE OR REPLACE FUNCTION handle_updated_at()
@@ -70,7 +66,7 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO public.profiles (id, email, full_name, role)
-  VALUES (new.id, new.email, new.raw_user_meta_data->>'full_name', 'member');
+  VALUES (new.id, new.email, new.raw_user_meta_data->>'full_name', 'admin');
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -93,9 +89,9 @@ CREATE TABLE public.proyectos_ec (
 -- Row Level Security (RLS) para proyectos_ec
 ALTER TABLE public.proyectos_ec ENABLE ROW LEVEL SECURITY;
 
--- Políticas Básicas para proyectos_ec (Ejemplo: Todos los usuarios autenticados pueden verlos)
-CREATE POLICY "Proyectos viewable by authenticated users." 
-  ON public.proyectos_ec FOR SELECT USING (auth.uid() IS NOT NULL);
+-- Políticas Básicas para proyectos_ec (Ejemplo: Todos públicos)
+CREATE POLICY "Proyectos viewable by everyone." 
+  ON public.proyectos_ec FOR SELECT USING (true);
 
 -- Trigger para updated_at (requiere añadir columna updated_at si se desea, por ahora solo created_at está)
 
