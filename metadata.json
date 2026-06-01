@@ -1,0 +1,6 @@
+{
+  "name": "Gestor de Tareas de Educación Continua",
+  "description": "Plataforma de gestión de tareas con roles, métricas y Google Calendar para el Equipo de Educación Continua",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
