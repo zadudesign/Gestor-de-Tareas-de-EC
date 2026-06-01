@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import Projects from './pages/Projects';
+import Settings from './pages/Settings';
+import Login from './pages/Login';
 
 function DashboardFallback() {
   return (
@@ -19,6 +21,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<DashboardFallback />} />
           <Route path="/projects" element={<Projects />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/login" element={<Login />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>
