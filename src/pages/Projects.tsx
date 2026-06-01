@@ -44,22 +44,25 @@ export default function Projects() {
   async function fetchProjects() {
     try {
       setLoading(true);
-      // Fetch projects with their task count
+      // Simplificamos la consulta para evitar el error de relación si no está propagado en Supabase
       const { data, error } = await supabase
         .from('proyectos_ec')
-        .select(`
-          *,
-          notificaciones_tareas:notificaciones_tareas(count)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      setProjects(data as ProyectoWithTasks[] || []);
+      // Inicializamos notificaciones_tareas como un arreglo vacío para evitar errores de renderizado
+      const projectsWithData = (data || []).map(p => ({
+        ...p,
+        notificaciones_tareas: [] 
+      }));
+
+      setProjects(projectsWithData as ProyectoWithTasks[]);
       setError(null);
     } catch (err: any) {
       console.error('Error fetching projects:', err);
-      setError(err.message || 'No se pudieron cargar los proyectos.');
+      setError('Error al conectar con la base de datos. Asegúrate de haber ejecutado el SQL en Supabase.');
     } finally {
       setLoading(false);
     }
