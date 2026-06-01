@@ -20,6 +20,17 @@ export interface ProyectoEC {
   created_at: string;
 }
 
+export interface NotificacionTarea {
+  id: string;
+  project_id: string;
+  title: string;
+  description: string | null;
+  status: TaskStatus;
+  due_date: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Task {
   id: string;
   title: string;

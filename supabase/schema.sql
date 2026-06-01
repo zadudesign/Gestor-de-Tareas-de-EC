@@ -93,5 +93,30 @@ ALTER TABLE public.proyectos_ec ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Proyectos viewable by everyone." 
   ON public.proyectos_ec FOR SELECT USING (true);
 
+-- 6. Tabla de Tareas del Proyecto (notificaciones_tareas)
+CREATE TABLE public.notificaciones_tareas (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  project_id UUID REFERENCES public.proyectos_ec(id) ON DELETE CASCADE NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  status public.task_status DEFAULT 'pending' NOT NULL,
+  due_date TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Row Level Security (RLS) para notificaciones_tareas
+ALTER TABLE public.notificaciones_tareas ENABLE ROW LEVEL SECURITY;
+
+-- Políticas Básicas para notificaciones_tareas
+CREATE POLICY "notificaciones_tareas viewable by everyone." 
+  ON public.notificaciones_tareas FOR SELECT USING (true);
+
+-- Trigger para updated_at en notificaciones_tareas
+CREATE TRIGGER notificaciones_tareas_updated_at
+  BEFORE UPDATE ON public.notificaciones_tareas
+  FOR EACH ROW
+  EXECUTE PROCEDURE handle_updated_at();
+
 -- Trigger para updated_at (requiere añadir columna updated_at si se desea, por ahora solo created_at está)
 
