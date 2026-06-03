@@ -24,7 +24,7 @@ export interface NotificacionTarea {
   proyecto: string;
   titulo: string;
   descripcion: string | null;
-  status: TaskStatus;
+  estado: string;
   fecha_vencimiento: string | null;
   tipo_tarifa: string | null;
   rol_destino: string | null;

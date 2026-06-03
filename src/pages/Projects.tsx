@@ -234,11 +234,11 @@ export default function Projects() {
                                 {projectTasks[project.id]?.map((task) => (
                                   <div key={task.id} className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex items-center justify-between group hover:border-blue-100 transition-colors">
                                     <div className="flex items-center space-x-3">
-                                      <div className={`w-2 h-2 rounded-full ${task.status === 'completed' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+                                      <div className={`w-2 h-2 rounded-full ${task.estado === 'Completado' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
                                       <span className="text-sm font-medium text-slate-700">{task.titulo}</span>
                                     </div>
                                     <span className="text-[10px] text-slate-300 group-hover:text-slate-400 transition-colors uppercase font-bold">
-                                      {task.status}
+                                      {task.estado}
                                     </span>
                                   </div>
                                 ))}

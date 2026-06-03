@@ -72,7 +72,7 @@ export function AddProjectTaskModal({ isOpen, onClose, onSuccess, initialProject
         descripcion: formData.descripcion || null,
         tipo_tarifa: formData.tipo_tarifa || null,
         rol_destino: formData.rol_destino || null,
-        status: 'pending'
+        estado: 'Pendiente'
       };
       
       if (formData.fecha_vencimiento) {

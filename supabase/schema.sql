@@ -98,7 +98,7 @@ CREATE TABLE public.notificaciones_tareas (
   proyecto UUID REFERENCES public.proyectos_ec(id) ON DELETE CASCADE NOT NULL,
   titulo TEXT NOT NULL,
   descripcion TEXT,
-  status public.task_status DEFAULT 'pending' NOT NULL,
+  estado TEXT DEFAULT 'Pendiente' NOT NULL,
   fecha_vencimiento TIMESTAMP WITH TIME ZONE,
   tipo_tarifa UUID REFERENCES public.configuracion_tarifas(id) ON DELETE SET NULL,
   rol_destino TEXT,
