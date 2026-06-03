@@ -129,8 +129,8 @@ export function AddProjectTaskModal({ isOpen, onClose, onSuccess, initialProject
                 onChange={e => setFormData({ ...formData, proyecto: e.target.value })}
               >
                 <option value="">Selecciona un proyecto</option>
-                {projects.map(p => (
-                  <option key={p.id} value={p.id}>{p.nombre}</option>
+                {projects.map((p, i) => (
+                  <option key={p.id || `project-${i}`} value={p.id}>{p.nombre}</option>
                 ))}
               </select>
             </div>
@@ -159,8 +159,8 @@ export function AddProjectTaskModal({ isOpen, onClose, onSuccess, initialProject
                 onChange={e => setFormData({ ...formData, tipo_tarifa: e.target.value })}
               >
                 <option value="">Selecciona una tarifa...</option>
-                {tariffs.map(t => (
-                  <option key={t.id} value={t.id}>{t.nombre_tipo} (${t.tarifa_hora})</option>
+                {tariffs.map((t, i) => (
+                  <option key={t.id || `tariff-${i}`} value={t.id}>{t.nombre_tipo} (${t.tarifa_hora})</option>
                 ))}
               </select>
             </div>
