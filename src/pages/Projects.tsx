@@ -179,7 +179,7 @@ export default function Projects() {
                         {expandedProject === project.id ? <ChevronDown className="w-4 h-4 text-blue-600" /> : <ChevronRight className="w-4 h-4 text-slate-300" />}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="font-bold text-slate-900 text-base">{project.name}</div>
+                        <div className="font-bold text-slate-900 text-base">{project.nombre}</div>
                       </td>
                       <td className="px-6 py-4">
                         {getStatusBadge(project.status)}

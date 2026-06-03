@@ -12,7 +12,7 @@ export interface Profile {
 
 export interface ProyectoEC {
   id: string;
-  name: string;
+  nombre: string;
   description: string | null;
   status: ProjectStatus;
   start_date: string | null;

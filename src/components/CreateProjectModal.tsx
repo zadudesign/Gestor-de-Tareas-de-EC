@@ -24,7 +24,7 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess }: CreateProject
         .from('proyectos_ec')
         .insert([
           {
-            name: name,
+            nombre: name,
             status: 'active',
           }
         ]);

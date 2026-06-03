@@ -78,7 +78,7 @@ CREATE TRIGGER on_auth_user_created
 -- 5. Tabla de Proyectos (proyectos_ec)
 CREATE TABLE public.proyectos_ec (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name TEXT NOT NULL,
+  nombre TEXT NOT NULL,
   description TEXT,
   status TEXT DEFAULT 'active' CHECK (status IN ('active', 'completed', 'on_hold')),
   start_date DATE,
