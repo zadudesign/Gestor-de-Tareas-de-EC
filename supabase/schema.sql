@@ -96,10 +96,12 @@ CREATE POLICY "Proyectos viewable by everyone."
 CREATE TABLE public.notificaciones_tareas (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   proyecto UUID REFERENCES public.proyectos_ec(id) ON DELETE CASCADE NOT NULL,
-  title TEXT NOT NULL,
-  description TEXT,
+  titulo TEXT NOT NULL,
+  descripcion TEXT,
   status public.task_status DEFAULT 'pending' NOT NULL,
-  due_date TIMESTAMP WITH TIME ZONE,
+  fecha_vencimiento TIMESTAMP WITH TIME ZONE,
+  tipo_tarifa UUID REFERENCES public.configuracion_tarifas(id) ON DELETE SET NULL,
+  rol_destino TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );

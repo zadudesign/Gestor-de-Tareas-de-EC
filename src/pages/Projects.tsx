@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { ProyectoEC, NotificacionTarea } from '../types';
 import { Plus, Search, Filter, MoreVertical, Loader2, FolderGit2, CheckCircle2, ChevronDown, ChevronRight } from 'lucide-react';
 import { CreateProjectModal } from '../components/CreateProjectModal';
+import { AddProjectTaskModal } from '../components/AddProjectTaskModal';
 
 interface ProyectoWithTasks extends ProyectoEC {
   notificaciones_tareas: { count: number }[];
@@ -14,6 +15,8 @@ export default function Projects() {
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
   const [projectTasks, setProjectTasks] = useState<Record<string, NotificacionTarea[]>>({});
   const [loadingTasks, setLoadingTasks] = useState<string | null>(null);
@@ -205,7 +208,13 @@ export default function Projects() {
                             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                               <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Tareas del Proyecto</h4>
                               {isAdmin && (
-                                <button className="text-[10px] font-bold text-blue-600 hover:underline uppercase tracking-widest">
+                                <button 
+                                  onClick={() => {
+                                    setSelectedProjectId(project.id);
+                                    setIsTaskModalOpen(true);
+                                  }}
+                                  className="text-[10px] font-bold text-blue-600 hover:underline uppercase tracking-widest"
+                                >
                                   + Agregar Tarea
                                 </button>
                               )}
@@ -226,7 +235,7 @@ export default function Projects() {
                                   <div key={task.id} className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex items-center justify-between group hover:border-blue-100 transition-colors">
                                     <div className="flex items-center space-x-3">
                                       <div className={`w-2 h-2 rounded-full ${task.status === 'completed' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-                                      <span className="text-sm font-medium text-slate-700">{task.title}</span>
+                                      <span className="text-sm font-medium text-slate-700">{task.titulo}</span>
                                     </div>
                                     <span className="text-[10px] text-slate-300 group-hover:text-slate-400 transition-colors uppercase font-bold">
                                       {task.status}
@@ -251,6 +260,29 @@ export default function Projects() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={fetchProjects}
+      />
+
+      <AddProjectTaskModal 
+        isOpen={isTaskModalOpen}
+        onClose={() => setIsTaskModalOpen(false)}
+        initialProjectId={selectedProjectId}
+        onSuccess={() => {
+          fetchProjects();
+          if (selectedProjectId) {
+            setLoadingTasks(selectedProjectId);
+            supabase
+              .from('notificaciones_tareas')
+              .select('*')
+              .eq('proyecto', selectedProjectId)
+              .order('created_at', { ascending: false })
+              .then(({ data }) => {
+                if (data) {
+                  setProjectTasks(prev => ({ ...prev, [selectedProjectId]: data }));
+                }
+                setLoadingTasks(null);
+              });
+          }
+        }}
       />
     </div>
   );

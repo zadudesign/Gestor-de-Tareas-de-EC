@@ -22,10 +22,12 @@ export interface ProyectoEC {
 export interface NotificacionTarea {
   id: string;
   proyecto: string;
-  title: string;
-  description: string | null;
+  titulo: string;
+  descripcion: string | null;
   status: TaskStatus;
-  due_date: string | null;
+  fecha_vencimiento: string | null;
+  tipo_tarifa: string | null;
+  rol_destino: string | null;
   created_at: string;
   updated_at: string;
 }
