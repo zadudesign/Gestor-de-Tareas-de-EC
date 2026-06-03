@@ -44,18 +44,35 @@ export default function Projects() {
   async function fetchProjects() {
     try {
       setLoading(true);
-      // Simplificamos la consulta para evitar el error de relación si no está propagado en Supabase
-      const { data, error } = await supabase
+      const { data: projectsData, error: projectsError } = await supabase
         .from('proyectos_ec')
         .select('*')
         .order('nombre', { ascending: true });
 
-      if (error) throw error;
+      if (projectsError) throw projectsError;
 
-      // Inicializamos notificaciones_tareas como un arreglo vacío para evitar errores de renderizado
-      const projectsWithData = (data || []).map(p => ({
+      // Obtener el conteo de tareas por proyecto manualmente para evitar problemas de caché de esquema en Supabase
+      const projectIds = projectsData?.map(p => p.id) || [];
+      const tasksCounts: Record<string, number> = {};
+      
+      if (projectIds.length > 0) {
+        const { data: tasksData, error: tasksError } = await supabase
+          .from('notificaciones_tareas')
+          .select('id, proyecto')
+          .in('proyecto', projectIds);
+          
+        if (!tasksError && tasksData) {
+          tasksData.forEach(task => {
+            if (task.proyecto) {
+              tasksCounts[task.proyecto] = (tasksCounts[task.proyecto] || 0) + 1;
+            }
+          });
+        }
+      }
+
+      const projectsWithData = (projectsData || []).map(p => ({
         ...p,
-        notificaciones_tareas: [] 
+        notificaciones_tareas: [{ count: tasksCounts[p.id] || 0 }] 
       }));
 
       setProjects(projectsWithData as ProyectoWithTasks[]);

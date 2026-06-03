@@ -80,7 +80,6 @@ CREATE TABLE public.proyectos_ec (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   nombre TEXT NOT NULL,
   description TEXT,
-  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'completed', 'on_hold')),
   start_date DATE,
   end_date DATE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
@@ -115,6 +114,32 @@ CREATE POLICY "notificaciones_tareas viewable by everyone."
 -- Trigger para updated_at en notificaciones_tareas
 CREATE TRIGGER notificaciones_tareas_updated_at
   BEFORE UPDATE ON public.notificaciones_tareas
+  FOR EACH ROW
+  EXECUTE PROCEDURE handle_updated_at();
+
+-- 7. Tabla de Configuración de Tarifas (configuracion_tarifas)
+CREATE TABLE public.configuracion_tarifas (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  nombre_tipo TEXT UNIQUE NOT NULL,
+  valor NUMERIC DEFAULT 0 NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Row Level Security (RLS) para configuracion_tarifas
+ALTER TABLE public.configuracion_tarifas ENABLE ROW LEVEL SECURITY;
+
+-- Políticas Básicas para configuracion_tarifas
+CREATE POLICY "configuracion_tarifas viewable by everyone." 
+  ON public.configuracion_tarifas FOR SELECT USING (true);
+CREATE POLICY "configuracion_tarifas insertable by everyone." 
+  ON public.configuracion_tarifas FOR INSERT WITH CHECK (true);
+CREATE POLICY "configuracion_tarifas updatable by everyone." 
+  ON public.configuracion_tarifas FOR UPDATE USING (true);
+
+-- Trigger para updated_at en configuracion_tarifas
+CREATE TRIGGER configuracion_tarifas_updated_at
+  BEFORE UPDATE ON public.configuracion_tarifas
   FOR EACH ROW
   EXECUTE PROCEDURE handle_updated_at();
 

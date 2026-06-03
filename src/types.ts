@@ -14,7 +14,6 @@ export interface ProyectoEC {
   id: string;
   nombre: string;
   description: string | null;
-  status: ProjectStatus;
   start_date: string | null;
   end_date: string | null;
   created_at: string;
@@ -27,6 +26,14 @@ export interface NotificacionTarea {
   description: string | null;
   status: TaskStatus;
   due_date: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ConfiguracionTarifa {
+  id: string;
+  nombre_tipo: string;
+  valor: number;
   created_at: string;
   updated_at: string;
 }

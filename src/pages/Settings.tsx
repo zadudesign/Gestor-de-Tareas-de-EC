@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { Settings as SettingsIcon, Users, Building, Shield, Loader2 } from 'lucide-react';
+import { TariffsConfig } from '../components/TariffsConfig';
 
 export default function Settings() {
   const [loading, setLoading] = useState(true);
@@ -100,9 +101,8 @@ export default function Settings() {
         </div>
       </div>
       
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mt-8">
-        <h3 className="font-semibold text-slate-900 mb-4 flex items-center"><SettingsIcon className="w-5 h-5 mr-2 text-slate-400" /> Preferencias Generales</h3>
-        <p className="text-slate-500 text-sm">Aquí se agregarán más opciones de configuración del sistema como integración de correos, notificaciones por defecto, etc.</p>
+      <div className="mt-8">
+        <TariffsConfig />
       </div>
     </div>
   );

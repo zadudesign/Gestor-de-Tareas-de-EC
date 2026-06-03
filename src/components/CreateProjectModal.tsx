@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { ProjectStatus } from '../types';
 
 interface CreateProjectModalProps {
   isOpen: boolean;
@@ -25,7 +24,6 @@ export function CreateProjectModal({ isOpen, onClose, onSuccess }: CreateProject
         .insert([
           {
             nombre: name,
-            status: 'active',
           }
         ]);
 
