@@ -8,9 +8,9 @@ export function TariffsConfig() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<{ nombre_tipo: string; valor: number }>({ nombre_tipo: '', valor: 0 });
+  const [editValues, setEditValues] = useState<{ nombre_tipo: string; tarifa_hora: number }>({ nombre_tipo: '', tarifa_hora: 0 });
   const [isAdding, setIsAdding] = useState(false);
-  const [newTariff, setNewTariff] = useState({ nombre_tipo: '', valor: 0 });
+  const [newTariff, setNewTariff] = useState({ nombre_tipo: '', tarifa_hora: 0 });
 
   useEffect(() => {
     fetchTariffs();
@@ -39,14 +39,14 @@ export function TariffsConfig() {
       setActionLoading(true);
       const { data, error } = await supabase
         .from('configuracion_tarifas')
-        .insert([{ nombre_tipo: newTariff.nombre_tipo.trim(), valor: newTariff.valor }])
+        .insert([{ nombre_tipo: newTariff.nombre_tipo.trim(), tarifa_hora: newTariff.tarifa_hora }])
         .select()
         .single();
       
       if (error) throw error;
       setTariffs(prev => [...prev, data]);
       setIsAdding(false);
-      setNewTariff({ nombre_tipo: '', valor: 0 });
+      setNewTariff({ nombre_tipo: '', tarifa_hora: 0 });
     } catch (error: any) {
       alert(`Error: ${error.message}`);
     } finally {
@@ -60,13 +60,13 @@ export function TariffsConfig() {
       setActionLoading(true);
       const { error } = await supabase
         .from('configuracion_tarifas')
-        .update({ nombre_tipo: editValues.nombre_tipo.trim(), valor: editValues.valor })
+        .update({ nombre_tipo: editValues.nombre_tipo.trim(), tarifa_hora: editValues.tarifa_hora })
         .eq('id', id);
 
       if (error) throw error;
       
       setTariffs(prev =>
-        prev.map(t => (t.id === id ? { ...t, nombre_tipo: editValues.nombre_tipo.trim(), valor: editValues.valor } : t))
+        prev.map(t => (t.id === id ? { ...t, nombre_tipo: editValues.nombre_tipo.trim(), tarifa_hora: editValues.tarifa_hora } : t))
       );
       setEditingId(null);
     } catch (error: any) {
@@ -139,8 +139,8 @@ export function TariffsConfig() {
                 type="number"
                 placeholder="Valor"
                 className="w-32 pl-7 pr-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={newTariff.valor}
-                onChange={e => setNewTariff(prev => ({ ...prev, valor: parseFloat(e.target.value) || 0 }))}
+                value={newTariff.tarifa_hora}
+                onChange={e => setNewTariff(prev => ({ ...prev, tarifa_hora: parseFloat(e.target.value) || 0 }))}
               />
             </div>
             <div className="flex items-center space-x-1">
@@ -177,8 +177,8 @@ export function TariffsConfig() {
                   <input
                     type="number"
                     className="w-32 pl-7 pr-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={editValues.valor}
-                    onChange={e => setEditValues(prev => ({ ...prev, valor: parseFloat(e.target.value) || 0 }))}
+                    value={editValues.tarifa_hora}
+                    onChange={e => setEditValues(prev => ({ ...prev, tarifa_hora: parseFloat(e.target.value) || 0 }))}
                   />
                 </div>
                 <div className="flex items-center space-x-1">
@@ -205,13 +205,13 @@ export function TariffsConfig() {
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="font-mono text-sm text-slate-500">
-                    ${(Number(tarifa.valor) || 0).toLocaleString('es-CO')}
+                    ${(Number(tarifa.tarifa_hora) || 0).toLocaleString('es-CO')}
                   </span>
                   <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity md:opacity-100">
                     <button
                       onClick={() => {
                         setEditingId(tarifa.id);
-                        setEditValues({ nombre_tipo: tarifa.nombre_tipo, valor: tarifa.valor });
+                        setEditValues({ nombre_tipo: tarifa.nombre_tipo, tarifa_hora: tarifa.tarifa_hora });
                       }}
                       className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                     >

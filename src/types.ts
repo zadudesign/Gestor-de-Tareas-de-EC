@@ -33,7 +33,7 @@ export interface NotificacionTarea {
 export interface ConfiguracionTarifa {
   id: string;
   nombre_tipo: string;
-  valor: number;
+  tarifa_hora: number;
   created_at: string;
   updated_at: string;
 }

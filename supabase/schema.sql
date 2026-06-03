@@ -121,7 +121,7 @@ CREATE TRIGGER notificaciones_tareas_updated_at
 CREATE TABLE public.configuracion_tarifas (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   nombre_tipo TEXT UNIQUE NOT NULL,
-  valor NUMERIC DEFAULT 0 NOT NULL,
+  tarifa_hora NUMERIC DEFAULT 0 NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
