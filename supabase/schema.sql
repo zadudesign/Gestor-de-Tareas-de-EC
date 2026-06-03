@@ -96,7 +96,7 @@ CREATE POLICY "Proyectos viewable by everyone."
 -- 6. Tabla de Tareas del Proyecto (notificaciones_tareas)
 CREATE TABLE public.notificaciones_tareas (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  project_id UUID REFERENCES public.proyectos_ec(id) ON DELETE CASCADE NOT NULL,
+  proyecto UUID REFERENCES public.proyectos_ec(id) ON DELETE CASCADE NOT NULL,
   title TEXT NOT NULL,
   description TEXT,
   status public.task_status DEFAULT 'pending' NOT NULL,

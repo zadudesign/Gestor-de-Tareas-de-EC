@@ -22,7 +22,7 @@ export interface ProyectoEC {
 
 export interface NotificacionTarea {
   id: string;
-  project_id: string;
+  proyecto: string;
   title: string;
   description: string | null;
   status: TaskStatus;

@@ -48,7 +48,7 @@ export default function Projects() {
       const { data, error } = await supabase
         .from('proyectos_ec')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('nombre', { ascending: true });
 
       if (error) throw error;
 
@@ -76,7 +76,7 @@ export default function Projects() {
       const { data, error } = await supabase
         .from('notificaciones_tareas')
         .select('*')
-        .eq('project_id', projectId)
+        .eq('proyecto', projectId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -95,19 +95,6 @@ export default function Projects() {
     } else {
       setExpandedProject(projectId);
       fetchTasksForProject(projectId);
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'active':
-        return <span className="px-2 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-800 rounded-full">Activo</span>;
-      case 'completed':
-        return <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Completado</span>;
-      case 'on_hold':
-        return <span className="px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-800 rounded-full">En Pausa</span>;
-      default:
-        return <span className="px-2 py-0.5 text-xs font-medium bg-slate-100 text-slate-800 rounded-full">{status}</span>;
     }
   };
 
@@ -166,7 +153,6 @@ export default function Projects() {
                 <tr>
                   <th className="px-6 py-4 w-12"></th>
                   <th className="px-6 py-4">Proyecto</th>
-                  <th className="px-6 py-4">Estado</th>
                   <th className="px-6 py-4">Tareas Asociadas</th>
                   {isAdmin && <th className="px-6 py-4 text-right">Acciones</th>}
                 </tr>
@@ -180,9 +166,6 @@ export default function Projects() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="font-bold text-slate-900 text-base">{project.nombre}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        {getStatusBadge(project.status)}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
@@ -200,7 +183,7 @@ export default function Projects() {
                     </tr>
                     {expandedProject === project.id && (
                       <tr className="bg-slate-50/30">
-                        <td colSpan={isAdmin ? 5 : 4} className="px-12 py-6">
+                        <td colSpan={isAdmin ? 4 : 3} className="px-12 py-6">
                           <div className="space-y-4">
                             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                               <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Tareas del Proyecto</h4>
